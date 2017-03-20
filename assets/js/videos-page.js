@@ -1,31 +1,33 @@
-angular.module('brushfire_videosPage', []).config(function($sceDelegateProvider) {
-  $sceDelegateProvider.resourceUrlWhitelist(['self', '*://www.youtube.com/**']);
-});
+angular.module('brushfire_videosPage', []).config([
+  '$sceDelegateProvider',
+  function($sceDelegateProvider) {
+    $sceDelegateProvider.resourceUrlWhitelist(['self', '*://www.youtube.com/**']);
+  }
+]);
 
 angular.module('brushfire_videosPage').controller('PageCtrl', [
   '$scope',
-  '$timeout',
-  function($scope, $timeout) {
+  '$http',
+  function($scope, $http) {
 
-    $scope.videosLoading = true;
+// First, show a loading spinner    $scope.videosLoading = true;
 
-    $timeout(function afterRetrievingVideos() {
-      var _videos = [
-        {
-          title: 'FUNNY BABY VIDEOS',
-          src: 'https://www.youtube.com/embed/_FvTVWjLiHM'
-        }, {
-          title: 'Justin Bieber - Baby ft. Ludacris',
-          src: 'https://www.youtube.com/embed/kffacxfA7G4'
-        }, {
-          title: 'Charlie bit my finger - again !',
-          src: 'https://www.youtube.com/embed/_OBlgSz8sSM'
-        }
-      ];
+    $scope.submitVideosError = false;
 
+    // Get the existing videos.
+    $http.get('/video').then(function onSuccess(sailsResponse) {
+      $scope.videos = sailsResponse.data;
+    }).catch(function onError(sailsResponse) {
+
+      if (sailsResponse.data.status === '404') {
+        return;
+      }
+
+      console.log("An unexpected error occurred: " + sailsResponse.data.statusText);
+
+    }). finally(function eitherWay() {
       $scope.videosLoading = false;
-      $scope.videos = _videos;
-    }, 750);
+    });
 
     $scope.submitNewVideo = function() {
       if ($scope.busySubmittingVideo) {
@@ -46,16 +48,18 @@ angular.module('brushfire_videosPage').controller('PageCtrl', [
 
       $scope.busySubmittingVideo = true;
 
-      $timeout(function() {
+      $http.post('/video', {
+        title: _newVideo.title,
+        src: _newVideo.src
+      }).then(function onSuccess(sailsResponse) {
         $scope.videos.unshift(_newVideo);
-
+      }).catch(function onError(sailsResponse) {
+        console.log("An unexpected error occurred: " + sailsResponse.data.statusText);
+      }). finally(function eitherWay() {
         $scope.busySubmittingVideo = false;
-
         $scope.newVideoTitle = '';
         $scope.newVideoSrc = '';
-
-      }, 750);
-    }
-    
+      });
+    };
   }
 ]);
