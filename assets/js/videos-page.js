@@ -10,7 +10,7 @@ angular.module('brushfire_videosPage').controller('PageCtrl', [
   '$http',
   function($scope, $http) {
 
-// First, show a loading spinner    $scope.videosLoading = true;
+    // First, show a loading spinner    $scope.videosLoading = true;
 
     $scope.submitVideosError = false;
 
@@ -48,18 +48,23 @@ angular.module('brushfire_videosPage').controller('PageCtrl', [
 
       $scope.busySubmittingVideo = true;
 
-      $http.post('/video', {
+      io.socket.post('/video', {
         title: _newVideo.title,
         src: _newVideo.src
-      }).then(function onSuccess(sailsResponse) {
+      }, function whenServerResponds(data, JWR) {
+        $scope.videosLoading = false;
+        if (JWR.statusCode >= 400) {
+          console.log('something bad happened');
+          return;
+        }
         $scope.videos.unshift(_newVideo);
-      }).catch(function onError(sailsResponse) {
-        console.log("An unexpected error occurred: " + sailsResponse.data.statusText);
-      }). finally(function eitherWay() {
         $scope.busySubmittingVideo = false;
+
         $scope.newVideoTitle = '';
         $scope.newVideoSrc = '';
+        $scope.$apply();
       });
+
     };
   }
 ]);
