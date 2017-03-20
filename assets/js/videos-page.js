@@ -15,18 +15,21 @@ angular.module('brushfire_videosPage').controller('PageCtrl', [
     $scope.submitVideosError = false;
 
     // Get the existing videos.
-    $http.get('/video').then(function onSuccess(sailsResponse) {
-      $scope.videos = sailsResponse.data;
-    }).catch(function onError(sailsResponse) {
-
-      if (sailsResponse.data.status === '404') {
+    io.socket.get('/video', function whenServerResponds(data, JWR) {
+      $scope.videosLoading = false;
+      if (JWR.statusCode >= 400) {
+        $scope.submitVideosError = true;
+        console.log('something bad happened');
         return;
       }
+      $scope.videos = data;
+      $scope.$apply();
 
-      console.log("An unexpected error occurred: " + sailsResponse.data.statusText);
+      io.socket.on('video', function whenAVideoIsCreatedUpdatedOrDestroyed (event) {
+        $scope.videos.unshift({title: event.data.title, src: event.data.src});
+        $scope.$apply();
+      });
 
-    }). finally(function eitherWay() {
-      $scope.videosLoading = false;
     });
 
     $scope.submitNewVideo = function() {
