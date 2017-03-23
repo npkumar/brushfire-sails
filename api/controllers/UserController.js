@@ -63,7 +63,12 @@ module.exports = {
               gravatarURL: gravatarURL
             };
 
-            return res.json(options);
+            User.create(options).exec(function(err, createdUser) {
+              if (err) {
+                return res.negotiate(err);
+              }
+              return res.json(createdUser);
+            });
           }
         });
       }
