@@ -7,8 +7,39 @@
 
 module.exports = {
 
+  connection: 'myPostgresqlServer',
+
   attributes: {
 
-  }
-};
+    email: {
+      type: 'string',
+      email: 'true',
+      unique: 'true'
+    },
 
+    username: {
+      type: 'string',
+      unique: 'true'
+    },
+
+    encryptedPassword: {
+      type: 'string'
+    },
+
+    gravatarURL: {
+      type: 'string'
+    },
+
+    deleted: {
+      type: 'boolean'
+    },
+
+    admin: {
+      type: 'boolean'
+    },
+
+    banned: {
+      type: 'boolean'
+    }
+  }
+}
