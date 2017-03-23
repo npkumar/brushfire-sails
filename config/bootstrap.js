@@ -11,26 +11,32 @@
 
 module.exports.bootstrap = function(cb) {
 
-  // It's very important to trigger this callback method when you are finished
-  // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
+  // Return the number of records in the video model
   Video.count().exec(function(err, numVideos) {
     if (err) {
       return cb(err);
     }
 
+    // If there's at least one log the number to the console.
     if (numVideos > 0) {
-      console.log('Number of video records: ', numVideos);
+      console.log('Existing video records: ', numVideos)
       return cb();
     }
-    // Seed the database with videos from YouTube.
+
+    // Add machinepack-youtube as a depedency
     var Youtube = require('machinepack-youtube');
+
     // List Youtube videos which match the specified search query.
-    Youtube.searchVideos({query: 'grumpy cat', apiKey: sails.config.google.apiKey, limit: 15}).exec({
+    Youtube.searchVideos({
+      query: 'grumpy cat',
+      apiKey: sails.config.google.apiKey,
+      limit: 15,
+    }).exec({
       // An unexpected error occurred.
       error: function(err) {
-        console.log('an error: ', err);
-        return cb(err);
+
       },
+      // OK.
       success: function(foundVideos) {
         _.each(foundVideos, function(video) {
           video.src = 'https://www.youtube.com/embed/' + video.id;
@@ -39,17 +45,15 @@ module.exports.bootstrap = function(cb) {
           delete video.id;
           delete video.url;
         });
-        console.log('the result: ', foundVideos);
 
         Video.create(foundVideos).exec(function(err, videoRecordsCreated) {
           if (err) {
             return cb(err);
           }
-          console.log(videoRecordsCreated);
+          console.log(foundVideos);
           return cb();
         });
-      }
+      },
     });
-
   });
 };
