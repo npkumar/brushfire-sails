@@ -8,7 +8,7 @@
 module.exports = {
 
   connection: 'myPostgresqlServer',
-
+  migrate: 'drop',
   attributes: {
 
     email: {
@@ -40,6 +40,14 @@ module.exports = {
 
     banned: {
       type: 'boolean'
+    },
+
+    toJSON: function() {
+      var modelAttributes = this.toObject();
+      delete modelAttributes.password;
+      delete modelAttributes.confirmation;
+      delete modelAttributes.encryptedPassword;
+      return modelAttributes;
     }
   }
 }
