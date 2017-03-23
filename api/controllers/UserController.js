@@ -7,6 +7,7 @@
 
 var Emailaddresses = require('machinepack-emailaddresses');
 var Passwords = require('machinepack-passwords');
+var Gravatar = require('machinepack-gravatar');
 
 module.exports = {
 
@@ -49,7 +50,20 @@ module.exports = {
             return res.serverError(err);
           },
           success: function(result) {
-            return res.json(result);
+
+            try {
+              var gravatarURL = Gravatar.getImageUrl({emailAddress: req.param('email')}).execSync();
+            } catch (err) {
+              return res.serverError(err);
+            }
+            var options = {
+              email: req.param('email'),
+              username: req.param('username'),
+              encryptedPassword: result,
+              gravatarURL: gravatarURL
+            };
+
+            return res.json(options);
           }
         });
       }
