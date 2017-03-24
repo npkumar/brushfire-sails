@@ -39,25 +39,21 @@ module.exports = {
       return res.badRequest('Invalid username: must consist of numbers and letters only.');
     }
 
-    Emailaddresses.validate({
-      string: req.param('email'),
-    }).exec({
+    Emailaddresses.validate({string: req.param('email')}).exec({
       // An unexpected error occurred.
       error: function(err) {
         return res.serverError(err);
       },
       // The provided string is not an email address.
       invalid: function() {
-        return res.badRequest('Doesn\'t look like an email address to me!'); 
+        return res.badRequest('Doesn\'t look like an email address to me!');
       },
       // OK.
-      success: function() { 
-        Passwords.encryptPassword({
-          password: req.param('password'), 
-        }).exec({
+      success: function() {
+        Passwords.encryptPassword({password: req.param('password')}).exec({
 
           error: function(err) {
-            return res.serverError(err); 
+            return res.serverError(err);
           },
 
           success: function(result) {
@@ -66,12 +62,10 @@ module.exports = {
 
             try {
 
-              options.gravatarURL = Gravatar.getImageUrl({
-                emailAddress: req.param('email') 
-              }).execSync();
+              options.gravatarURL = Gravatar.getImageUrl({emailAddress: req.param('email')}).execSync();
 
             } catch (err) {
-              return res.serverError(err); 
+              return res.serverError(err);
             }
 
             options.email = req.param('email');
@@ -113,70 +107,71 @@ module.exports = {
     // Try to look up user using the provided email address
     User.findOne(req.param('id')).exec(function foundUser(err, user) {
       // Handle error
-      if (err) return res.negotiate(err); 
+      if (err)
+        return res.negotiate(err);
 
       // Handle no user being found
-      if (!user) return res.notFound(); 
+      if (!user)
+        return res.notFound();
 
       // Return the user
-      return res.json(user); 
+      return res.json(user);
     });
   },
 
   delete: function(req, res) {
 
-    if (!req.param('id')) { 
+    if (!req.param('id')) {
       return res.badRequest('id is a required parameter.');
     }
 
-    User.destroy({ 
-      id: req.param('id')
-    }).exec(function(err, usersDestroyed) {
-      if (err) return res.negotiate(err); 
-      if (usersDestroyed.length === 0) { 
+    User.destroy({id: req.param('id')}).exec(function(err, usersDestroyed) {
+      if (err)
+        return res.negotiate(err);
+      if (usersDestroyed.length === 0) {
         return res.notFound();
       }
-      return res.ok(); 
+      return res.ok();
     });
   },
   removeProfile: function(req, res) {
 
-    if (!req.param('id')) { 
+    if (!req.param('id')) {
       return res.badRequest('id is a required parameter.');
     }
 
-    User.update({ 
+    User.update({
       id: req.param('id')
     }, {
-      deleted: true 
+      deleted: true
     }, function(err, removedUser) {
 
-      if (err) return res.negotiate(err); 
+      if (err)
+        return res.negotiate(err);
       if (removedUser.length === 0) {
         return res.notFound();
       }
 
-      return res.ok(); 
+      return res.ok();
     });
   },
   restoreProfile: function(req, res) {
 
-    User.findOne({ 
+    User.findOne({
       email: req.param('email')
     }, function foundUser(err, user) {
-      if (err) return res.negotiate(err); 
-      if (!user) return res.notFound();
+      if (err)
+        return res.negotiate(err);
+      if (!user)
+        return res.notFound();
 
-      Passwords.checkPassword({ 
-        passwordAttempt: req.param('password'),
-        encryptedPassword: user.encryptedPassword
-      }).exec({
+      Passwords.checkPassword({passwordAttempt: req.param('password'), encryptedPassword: user.encryptedPassword}).exec({
 
-        error: function(err) { 
+        error: function(err) {
           return res.negotiate(err);
         },
 
-        incorrect: function() { 
+        incorrect: function() {
           return res.notFound();
         },
 
@@ -184,9 +179,7 @@ module.exports = {
 
           User.update({
             id: user.id
-          }, {
-            deleted: false
-          }).exec(function(err, updatedUser) {
+          }, {deleted: false}).exec(function(err, updatedUser) {
 
             return res.json(updatedUser);
           });
@@ -199,9 +192,7 @@ module.exports = {
 
     try {
 
-      var restoredGravatarURL = gravatarURL = Gravatar.getImageUrl({
-        emailAddress: req.param('email')
-      }).execSync();
+      var restoredGravatarURL = gravatarURL = Gravatar.getImageUrl({emailAddress: req.param('email')}).execSync();
 
       return res.json(restoredGravatarURL);
 
@@ -215,43 +206,40 @@ module.exports = {
     User.update({
       id: req.param('id')
     }, {
-      gravatarURL: req.param('gravatarURL') 
+      gravatarURL: req.param('gravatarURL')
     }, function(err, updatedUser) {
 
-      if (err) return res.negotiate(err); 
+      if (err)
+        return res.negotiate(err);
 
-      return res.json(updatedUser); 
+      return res.json(updatedUser);
 
     });
   },
 
   changePassword: function(req, res) {
 
-    if (_.isUndefined(req.param('password'))) { 
+    if (_.isUndefined(req.param('password'))) {
       return res.badRequest('A password is required!');
     }
 
-    if (req.param('password').length < 6) { 
+    if (req.param('password').length < 6) {
       return res.badRequest('Password must be at least 6 characters!');
     }
 
-    Passwords.encryptPassword({ 
-      password: req.param('password'),
-    }).exec({
+    Passwords.encryptPassword({password: req.param('password')}).exec({
       error: function(err) {
-        return res.serverError(err); 
+        return res.serverError(err);
       },
       success: function(result) {
 
-        User.update({ 
+        User.update({
           id: req.param('id')
-        }, {
-          encryptedPassword: result
-        }).exec(function(err, updatedUser) {
+        }, {encryptedPassword: result}).exec(function(err, updatedUser) {
           if (err) {
             return res.negotiate(err);
           }
-          return res.json(updatedUser); 
+          return res.json(updatedUser);
         });
       }
     });
@@ -259,42 +247,75 @@ module.exports = {
 
   adminUsers: function(req, res) {
 
-    User.find().exec(function(err, users){    
+    User.find().exec(function(err, users) {
 
-      if (err) return res.negotiate(err);   
+      if (err)
+        return res.negotiate(err);
 
-      return res.json(users);     
+      return res.json(users);
 
     });
   },
 
   updateAdmin: function(req, res) {
 
-    User.update(req.param('id'), {    
-      admin: req.param('admin')   
-    }).exec(function(err, update){
+    User.update(req.param('id'), {admin: req.param('admin')}).exec(function(err, update) {
 
-     if (err) return res.negotiate(err);  
+      if (err)
+        return res.negotiate(err);
 
-      return res.ok();       
+      return res.ok();
     });
   },
 
   updateBanned: function(req, res) {
-    User.update(req.param('id'), {
-      banned: req.param('banned')
-    }).exec(function(err, update){
-     if (err) return res.negotiate(err);
+    User.update(req.param('id'), {banned: req.param('banned')}).exec(function(err, update) {
+      if (err)
+        return res.negotiate(err);
       return res.ok();
     });
   },
 
   updateDeleted: function(req, res) {
-    User.update(req.param('id'), {
-      deleted: req.param('deleted')
-    }).exec(function(err, update){
-     if (err) return res.negotiate(err);
+    User.update(req.param('id'), {deleted: req.param('deleted')}).exec(function(err, update) {
+      if (err)
+        return res.negotiate(err);
       return res.ok();
     });
+  },
+
+  login: function(req, res) {
+    User.findOne({
+      or: [
+        {
+          email: req.param('email')
+        }, {
+          username: req.param('username')
+        }
+      ]
+    }, function foundUser(err, createdUser) {
+      if (err)
+        return res.negotiate(err);
+      if (!createdUser)
+        return res.notFound();
+      Passwords.checkPassword({passwordAttempt: req.param('password'), encryptedPassword: createdUser.encryptedPassword}).exec({
+        error: function(err) {
+          return res.negotiate(err);
+        },
+        incorrect: function() {
+          return res.notFound();
+        },
+        success: function() {
+          if (createdUser.deleted) {
+            return res.forbidden("'Your account has been deleted. Please visit http://brushfire.io/restore to restore your account.'");
+          }
+          if (createdUser.banned) {
+            return res.forbidden("'Your account has been banned, most likely for adding dog videos in violation of the Terms of Service. Please contact Chad or his mother.'");
+          }
+          return res.ok();
+        }
+      });
+    });
   }
+
 };
