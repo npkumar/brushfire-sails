@@ -66,7 +66,7 @@ module.exports = {
             User.create(options).exec(function(err, createdUser) {
               if (err) {
                 if (err.invalidAttributes && err.invalidAttributes.email && err.invalidAttributes.email[0] && err.invalidAttributes.email[0].rule === 'unique') {
-                	return res.alreadyInUse(err);
+                  return res.alreadyInUse(err);
                 }
                 if (err.invalidAttributes && err.invalidAttributes.username && err.invalidAttributes.username[0] && err.invalidAttributes.username[0].rule === 'unique') {
                   return res.alreadyInUse(err);
@@ -79,5 +79,41 @@ module.exports = {
         });
       }
     });
+  },
+
+  profile: function(req, res) {
+    User.findOne(req.param('id')).exec(function foundUser(err, user) {
+      if (err)
+        return res.negotiate(err);
+      if (!user)
+        return res.notFound();
+
+      var options = {
+        email: user.email,
+        username: user.username,
+        gravatarURL: user.gravatarURL,
+        deleted: user.deleted,
+        admin: user.admin,
+        banned: user.banned,
+        id: user.id
+      };
+
+      return res.json(user);
+    });
+  },
+
+  delete: function(req, res) {
+    if (!req.param('id')) {
+      return res.badRequest('id is a required parameter.');
+    }
+    User.destroy({id: req.param('id')}).exec(function(err, usersDestroyed) {
+      if (err)
+        return res.negotiate(err);
+      if (usersDestroyed.length === 0) {
+        return res.notFound();
+      }
+      return res.ok();
+    });
   }
+
 }
