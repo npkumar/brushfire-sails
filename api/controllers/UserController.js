@@ -205,6 +205,38 @@ module.exports = {
         });
       }
     });
+  },
+
+  adminUsers: function(req, res) {
+    User.find().exec(function(err, users) {
+      if (err)
+        return res.negotiate(err);
+      return res.json(users);
+    });
+  },
+
+  updateAdmin: function(req, res) {
+    User.update(req.param('id'), {admin: req.param('admin')}).exec(function(err, update) {
+      if (err)
+        return res.negotiate(err);
+      res.ok();
+    });
+  },
+
+  updateBanned: function(req, res) {
+    User.update(req.param('id'), {banned: req.param('banned')}).exec(function(err, update) {
+      if (err)
+        return res.negotiate(err);
+      res.ok();
+    });
+  },
+
+  updateDeleted: function(req, res) {
+    User.update(req.param('id'), {deleted: req.param('deleted')}).exec(function(err, update) {
+      if (err)
+        return res.negotiate(err);
+      res.ok();
+    });
   }
 
 }
