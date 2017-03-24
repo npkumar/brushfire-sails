@@ -20,16 +20,23 @@ module.exports.bootstrap = function(cb) {
     // If there's at least one log the number to the console.
     if (numVideos > 0) {
       // return cb();
-      return createTestUsers();
+      return createTestUsers();   
     }
 
     // Add machinepack-youtube as a depedency
     var Youtube = require('machinepack-youtube');
 
     // List Youtube videos which match the specified search query.
-    Youtube.searchVideos({query: 'grumpy cat', apiKey: sails.config.google.apiKey, limit: 15}).exec({
+    Youtube.searchVideos({
+      query: 'grumpy cat',
+      apiKey: sails.config.google.apiKey,
+      limit: 15,
+    }).exec({
       // An unexpected error occurred.
-      error: function(err) {},
+      error: function(err) {
+        console.log('the error', err);
+
+      },
       // OK.
       success: function(foundVideos) {
         _.each(foundVideos, function(video) {
@@ -45,9 +52,9 @@ module.exports.bootstrap = function(cb) {
             return cb(err);
           }
           // return cb();
-          return createTestUsers();
+          return createTestUsers();   
         });
-      }
+      },
     });
   });
 
@@ -56,12 +63,16 @@ module.exports.bootstrap = function(cb) {
     var Passwords = require('machinepack-passwords');
     var Gravatar = require('machinepack-gravatar');
 
-    User.findOne({email: 'sailsinaction@gmail.com'}).exec(function(err, foundUser) {
-      if (foundUser) {
-        return cb();
+    User.findOne({
+      email: 'sailsinaction@gmail.com'
+    }).exec(function(err, foundUser) {
+      if (foundUser){
+       return cb();
       }
 
-      Passwords.encryptPassword({password: 'abc123'}).exec({
+      Passwords.encryptPassword({
+        password: 'abc123',
+      }).exec({
         error: function(err) {
           return cb(err);
         },
@@ -70,7 +81,9 @@ module.exports.bootstrap = function(cb) {
           var options = {};
 
           try {
-            options.gravatarURL = Gravatar.getImageUrl({emailAddress: 'sailsinaction@gmail.com'}).execSync();
+            options.gravatarURL = Gravatar.getImageUrl({
+              emailAddress: 'sailsinaction@gmail.com'
+            }).execSync();
 
           } catch (err) {
             return cb(err);
@@ -92,5 +105,4 @@ module.exports.bootstrap = function(cb) {
       });
     });
   }
-  
 };
