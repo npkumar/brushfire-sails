@@ -114,6 +114,52 @@ module.exports = {
       }
       return res.ok();
     });
+  },
+
+  removeProfile: function(req, res) {
+
+    if (!req.param('id')) {
+      return res.badRequest('id is a required parameter.');
+    }
+    User.update({
+      id: req.param('id')
+    }, {
+      deleted: true
+    }, function(err, removedUser) {
+      if (err)
+        return res.negotiate(err);
+      if (removedUser.length === 0) {
+        return res.notFound();
+      }
+      return res.ok();
+    });
+  },
+
+  restoreProfile: function(req, res) {
+    User.findOne({
+      email: req.param('email')
+    }, function foundUser(err, user) {
+      if (err)
+        return res.negotiate(err);
+      if (!user)
+        return res.notFound();
+
+      Passwords.checkPassword({passwordAttempt: req.param('password'), encryptedPassword: user.encryptedPassword}).exec({
+        error: function(err) {
+          return res.negotiate(err);
+        },
+        incorrect: function() {
+          return res.notFound();
+        },
+        success: function() {
+          User.update({
+            id: user.id
+          }, {deleted: false}).exec(function(err, updatedUser) {
+            return res.json(updatedUser);
+          });
+        }
+      });
+    });
   }
 
 }
