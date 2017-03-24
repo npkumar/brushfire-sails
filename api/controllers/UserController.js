@@ -320,7 +320,7 @@ module.exports = {
     User.findOne(req.session.userId, function foundUser(err, createdUser) {
       if (err)
         return res.negotiate(err);
-      if (!user) {
+      if (!createdUser) {
         sails.log.verbose('Session refers to a user who no longer exists.');
         return res.redirect('/');
       }
