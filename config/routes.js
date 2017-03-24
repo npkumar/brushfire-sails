@@ -5,7 +5,7 @@ module.exports.routes = {
    *************************************************************/
 
   'PUT /login': 'UserController.login',
-
+  'GET /logout': 'UserController.logout',
   /*************************************************************
    * Server-rendered HTML Pages                                *
    *************************************************************/

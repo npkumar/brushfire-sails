@@ -151,7 +151,7 @@ module.exports = {
       if (removedUser.length === 0) {
         return res.notFound();
       }
-
+      req.session.userId = null;
       return res.ok();
     });
   },
@@ -180,7 +180,7 @@ module.exports = {
           User.update({
             id: user.id
           }, {deleted: false}).exec(function(err, updatedUser) {
-
+            req.session.userId = user.id;
             return res.json(updatedUser);
           });
         }
@@ -312,9 +312,25 @@ module.exports = {
           if (createdUser.banned) {
             return res.forbidden("'Your account has been banned, most likely for adding dog videos in violation of the Terms of Service. Please contact Chad or his mother.'");
           }
+          req.session.userId = user.id;
           return res.ok();
         }
       });
+    });
+  },
+
+  logout: function(req, res) {
+    if (!req.session.userId)
+      return res.redirect('/');
+    User.findOne(req.session.userId, function foundUser(err, createdUser) {
+      if (err)
+        return res.negotiate(err);
+      if (!user) {
+        sails.log.verbose('Session refers to a user who no longer exists.');
+        return res.redirect('/');
+      }
+      req.session.userId = null;
+      return res.redirect('/');
     });
   }
 
