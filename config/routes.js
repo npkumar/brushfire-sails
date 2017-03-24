@@ -9,17 +9,7 @@ module.exports.routes = {
   /*************************************************************
    * Server-rendered HTML Pages                                *
    *************************************************************/
-  'GET /': {
-    view: 'homepage',
-    locals: {
-      me: {
-        id: null,
-        gravatarURL: 'http://www.gravatar.com/avatar/ef3eac6c71fdf24b13db12d8ff8d1264?',
-        email: 'sailsinaction@gmail.com',
-        username: 'sails-in-action'
-      }
-    }
-  },
+  'GET /': 'PageController.showHomePage',
 
   'GET /videos': {
     view: 'videos',

@@ -59,11 +59,8 @@ module.exports = {
           success: function(result) {
 
             var options = {};
-
             try {
-
               options.gravatarURL = Gravatar.getImageUrl({emailAddress: req.param('email')}).execSync();
-
             } catch (err) {
               return res.serverError(err);
             }
@@ -80,20 +77,18 @@ module.exports = {
                 console.log('the error is: ', err.invalidAttributes);
 
                 if (err.invalidAttributes && err.invalidAttributes.email && err.invalidAttributes.email[0] && err.invalidAttributes.email[0].rule === 'unique') {
-
                   // return res.send(409, 'Email address is already taken by another user, please try again.');
                   return res.alreadyInUse(err);
                 }
 
                 if (err.invalidAttributes && err.invalidAttributes.username && err.invalidAttributes.username[0] && err.invalidAttributes.username[0].rule === 'unique') {
-
                   // return res.send(409, 'Username is already taken by another user, please try again.');
                   return res.alreadyInUse(err);
                 }
 
                 return res.negotiate(err);
               }
-
+              req.session.userId = createdUser.id;
               return res.json(createdUser);
             });
           }
@@ -312,7 +307,7 @@ module.exports = {
           if (createdUser.banned) {
             return res.forbidden("'Your account has been banned, most likely for adding dog videos in violation of the Terms of Service. Please contact Chad or his mother.'");
           }
-          req.session.userId = user.id;
+          req.session.userId = createdUser.id;
           return res.ok();
         }
       });
