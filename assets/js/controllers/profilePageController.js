@@ -1,109 +1,122 @@
-angular.module('brushfire').controller('profilePageController', [
-  '$location',
-  '$routeParams',
-  '$scope',
-  '$http',
-  function($location, $routeParams, $scope, $http) {
+angular.module('brushfire').controller('profilePageController', ['$scope', '$http', function($scope, $http){
 
-    // Just a hack so we can type `SCOPE` in the Chrome inspector.
-    SCOPE = $scope;
+/*
+   ____          _____                _           
+  / __ \        |  __ \              | |          
+ | |  | |_ __   | |__) |___ _ __   __| | ___ _ __ 
+ | |  | | '_ \  |  _  // _ \ '_ \ / _` |/ _ \ '__|
+ | |__| | | | | | | \ \  __/ | | | (_| |  __/ |   
+  \____/|_| |_| |_|  \_\___|_| |_|\__,_|\___|_|   
+                                                  
+                                                  
+*/
 
-    $scope.me = window.SAILS_LOCALS.me;
+  // Just a hack so we can type `SCOPE` in the Chrome inspector.
+  SCOPE=$scope;
 
-    /////////////////////////////////////////////////////////////////////////////////
-    // When HTML is rendered... (i.e. when the page loads)
-    /////////////////////////////////////////////////////////////////////////////////
+  $scope.me = window.SAILS_LOCALS.me;
+  $scope.frontEnd = window.SAILS_LOCALS.frontEnd;
 
-    // Set up initial objects
-    // (kind of like our schema for the page)
-    $scope.userProfile = {
-      properties: {},
-      errorMsg: '',
-      saving: false,
-      loading: false,
-      noProfile: false
-    };
+  $scope.numOfTutorials = $scope.frontEnd.numOfTutorials;
+  $scope.numOfFollowers = $scope.frontEnd.numOfFollowers;
+  $scope.numOfFollowing = $scope.frontEnd.numOfFollowing;
+  $scope.followedByLoggedInUser = $scope.frontEnd.followedByLoggedInUser;
+
+  // Get the tutorial id form the current URL path:  /tutorials/1
+  $scope.fromUrlTutorialId = window.location.pathname.split('/')[1];
+
+  // Set up initial objects
+  // (kind of like our schema for the page)
+  $scope.userProfile = {
+    properties: {},
+    errorMsg: '',
+    saving: false,
+    loading: false,
+    noProfile: false
+  };
+
+  $scope.userProfile.loading = true;
+
+/* 
+  _____   ____  __  __   ______               _       
+ |  __ \ / __ \|  \/  | |  ____|             | |      
+ | |  | | |  | | \  / | | |____   _____ _ __ | |_ ___ 
+ | |  | | |  | | |\/| | |  __\ \ / / _ \ '_ \| __/ __|
+ | |__| | |__| | |  | | | |___\ V /  __/ | | | |_\__ \
+ |_____/ \____/|_|  |_| |______\_/ \___|_| |_|\__|___/
+
+*/
+
+  $scope.followOrUnfollow = function() {
 
     $scope.userProfile.loading = true;
 
-    // // Build up route
-    // var theRoute = '/user/profile/' +  $routeParams.id;
-
-    // // Submit GET request to /user/profile/:id
-    // $http.get(theRoute)
-    // .then(function onSuccess(sailsResponse){
-    //   // console.log('sailsResponse.data.deleted: ', sailsResponse.data.deleted);
-    //   // console.log('sailsResponse: ', sailsResponse);
-
-    //   // If deleted profile remove interface and show message.
-    //   if (sailsResponse.data.deleted === true) {
-    //     $scope.userProfile.errorMsg = 'No profile found.';
-    //     return $scope.userProfile.noProfile = true;
-    //   }
-    //   // console.log(sailsResponse.data.id);
-    //   // window.location = '#/profile/' + sailsResponse.data.id;
-    //   // console.log('The response is: ', sailsResponse);
-    //   $scope.userProfile.properties.email = sailsResponse.data.email;
-    //   $scope.userProfile.properties.username = sailsResponse.data.username;
-    //   $scope.userProfile.properties.admin = sailsResponse.data.admin;
-    //   $scope.userProfile.properties.banned = sailsResponse.data.banned;
-    //   $scope.userProfile.properties.gravatarURL = sailsResponse.data.gravatarURL;
-    //   $scope.userProfile.properties.id = sailsResponse.data.id;
-
-    //   $scope.userProfile.loading = false;
-    // })
-    // .catch(function onError(sailsResponse){
-    //   // console.log(sailsResponse);
-
-    //   // If no profile found remove interface and show error message.
-    //   if(sailsResponse.status === 404) {
-    //     $scope.userProfile.noProfile = true;
-    //     $scope.userProfile.errorMsg = 'No profile found.';
-    //     return;
-    //   }
-
-    //   // Handle all other errors
-    //   $scope.userProfile.errorMsg = 'An unexpected error occurred: '+(sailsResponse.data||sailsResponse.status);
-
-    // })
-    // .finally(function eitherWay(){
-    //   $scope.userProfile.loading = false;
-    // });
-
-    $scope.removeProfile = function() {
-
-      // console.log('the change userprofile is: ', $scope.userProfile);
-
-      // var theRoute = '/user/removeProfile/' + $scope.userProfile.properties.id;
-      $http.put('/user/removeProfile', {deleted: true}).then(function onSuccess(sailsResponse) {
-
-        // console.log('sailsResponse: ', sailsResponse);
-        // $scope.userProfile.properties.gravatarURL = sailsResponse.data.gravatarURL;
-        window.location = '/signup';
-        //
-        // toastr.success('Password Updated!');
-
+    if ($scope.followedByLoggedInUser) {
+      $http.put('/user/unfollow/', {
+        username: $scope.fromUrlTutorialId
+      })
+      .then(function success(sailsResponse){
+        $scope.followedByLoggedInUser = false;
         $scope.userProfile.loading = false;
-      }).catch(function onError(sailsResponse) {
-        // console.log('sailsresponse: ', sailsResponse)
-        // Otherwise, display generic error if the error is unrecognized.
-        $scope.userProfile.errorMsg = 'An unexpected error occurred: ' + (sailsResponse.data || sailsResponse.status);
+        $scope.numOfFollowers = sailsResponse.data.numOfFollowers;
+        $scope.numOfFollowing = sailsResponse.data.numOfFollowing;
+      })
+      .catch(function onError(sailsResponse){
+        console.error(sailsResponse);
 
-      }). finally(function eitherWay() {
-        $scope.loading = false;
+      })
+      .finally(function eitherWay(){
+        $scope.userProfile.loading = false;
       });
-    };
 
-    $scope.deleteProfile = function() {
+    }
 
-      var theRoute = 'user/delete/' + $routeParams.id;
+    if (!$scope.followedByLoggedInUser) {
+      $http.put('/user/follow/', {
+        username: $scope.fromUrlTutorialId
+      })
+      .then(function success(sailsResponse){
+        console.log(sailsResponse);
+        console.log('hit follow')
+        $scope.followedByLoggedInUser = true;
+        $scope.userProfile.loading = false;
+        $scope.numOfFollowers = sailsResponse.data.numOfFollowers;
+        $scope.numOfFollowing = sailsResponse.data.numOfFollowing;
+      })
+      .catch(function onError(sailsResponse){
+        console.error(sailsResponse);
 
-      $http.delete(theRoute).then(function onSuccess(deletedProfile) {
-        window.location = '#/signup';
-      }).catch(function onError(err) {
-        $scope.userProfile.errorMsg = 'An unexpected error occurred: ' + err;
+      })
+      .finally(function eitherWay(){
+        $scope.userProfile.loading = false;
       });
-    };
+    }
+  };
 
-  }
-]);
+  $scope.removeProfile = function() {
+
+    $scope.userProfile.loading = true;
+
+    // var theRoute = '/user/removeProfile/' + $scope.userProfile.properties.id;
+    // var theRoute = '/user/removeProfile/' + $scope.me.id;
+    // var theRoute = '/user/removeProfile';
+    $http.put('/user/remove-profile', {
+      deleted: true
+    })
+    .then(function onSuccess(sailsResponse) {
+      // $scope.userProfile.properties.gravatarURL = sailsResponse.data.gravatarURL;
+      window.location = '/profile/restore';
+      // 
+      // toastr.success('Password Updated!');
+    })
+    .catch(function onError(sailsResponse) {
+      // Otherwise, display generic error if the error is unrecognized.
+      $scope.userProfile.errorMsg = 'An unexpected error occurred: ' + (sailsResponse.data || sailsResponse.status);
+
+    })
+    .finally(function eitherWay() {
+      $scope.userProfile.loading = false;
+    });
+  };
+
+}]);
