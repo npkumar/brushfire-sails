@@ -15,5 +15,19 @@ module.exports.routes = {
   'GET /edit-profile': 'PageController.showEditProfilePage',
   'GET /signup': 'PageController.showSignupPage',
   'GET /restore-profile': 'PageController.showRestorePage',
-  'GET /administration': 'PageController.showAdminPage'
+  'GET /administration': 'PageController.showAdminPage',
+
+  'GET /video': 'VideoController.find',
+  'POST /video': 'VideoController.create',
+
+  'POST /user/signup': 'UserController.signup',
+  'PUT /user/removeProfile': 'UserController.removeProfile',
+  'PUT /user/restoreProfile': 'UserController.restoreProfile',
+  'PUT /user/restoreGravatarURL': 'UserController.restoreGravatarURL',
+  'PUT /user/updateProfile/:id': 'UserController.updateProfile',
+  'PUT /user/changePassword': 'UserController.changePassword',
+  'GET /user/adminUsers': 'UserController.adminUsers',
+  'PUT /user/updateAdmin/:id': 'UserController.updateAdmin',
+  'PUT /user/updateBanned/:id': 'UserController.updateBanned',
+  'PUT /user/updateDeleted/:id': 'UserController.updateDeleted'
 };
