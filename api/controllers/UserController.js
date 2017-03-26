@@ -66,7 +66,7 @@ module.exports = {
             }
 
             options.email = req.param('email');
-            options.username = splitUsername;
+            options.username = req.param('username');
             options.encryptedPassword = result;
             options.deleted = false;
             options.admin = false;
@@ -131,12 +131,12 @@ module.exports = {
   },
   removeProfile: function(req, res) {
 
-    if (!req.param('id')) {
-      return res.badRequest('id is a required parameter.');
-    }
+    // if (!req.param('id')) {
+    //   return res.badRequest('id is a required parameter.');
+    // }
 
     User.update({
-      id: req.param('id')
+      id: req.session.userId
     }, {
       deleted: true
     }, function(err, removedUser) {
@@ -199,7 +199,7 @@ module.exports = {
   updateProfile: function(req, res) {
 
     User.update({
-      id: req.param('id')
+      id: req.session.userId
     }, {
       gravatarURL: req.param('gravatarURL')
     }, function(err, updatedUser) {
@@ -229,7 +229,8 @@ module.exports = {
       success: function(result) {
 
         User.update({
-          id: req.param('id')
+          //id: req.param('id')
+          id: req.session.userId
         }, {encryptedPassword: result}).exec(function(err, updatedUser) {
           if (err) {
             return res.negotiate(err);
