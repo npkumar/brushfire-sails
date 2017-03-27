@@ -282,7 +282,7 @@ module.exports = {
         numOfFollowing: 1
       },
       followers: [{
-         username: 'nikolatesla',
+        username: 'nikolatesla',
         gravatarURL: 'http://www.gravatar.com/avatar/c06112bbecd8a290a00441bf181a24d3?'
       }],
       tutorials: [{
@@ -465,7 +465,7 @@ module.exports = {
         numOfFollowing: 1
       },
       following: [{
-         username: 'nikolatesla',
+        username: 'nikolatesla',
         gravatarURL: 'http://www.gravatar.com/avatar/c06112bbecd8a290a00441bf181a24d3?'
       }],
       tutorials: [{

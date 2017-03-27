@@ -91,12 +91,9 @@ module.exports = {
       stars: 4
     }];
 
-    console.log('skip: ', req.param('skip'));
-
-
     return res.json({
       options: {
-        totalTutorials: 30,
+        totalTutorials: 10,
         updatedTutorials: tutorials
       }
     });

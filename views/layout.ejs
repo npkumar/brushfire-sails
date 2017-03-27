@@ -12,7 +12,6 @@
     <!--STYLES-->
     <link rel="stylesheet" href="/styles/angular-toastr.css">
     <link rel="stylesheet" href="/styles/bootstrap.min.css">
-    <link rel="stylesheet" href="/styles/custom.css">
     <link rel="stylesheet" href="/styles/dependencies/angular-toastr.css">
     <link rel="stylesheet" href="/styles/dependencies/bootstrap.min.css">
     <link rel="stylesheet" href="/styles/dependencies/fontawesome.min.css">
@@ -21,7 +20,7 @@
     <!--STYLES END-->
 
     <!-- Expose sails locals on the window object -->
-    <script type="text/javascript"> //#A
+    <script type="text/javascript">
     window.SAILS_LOCALS = {
       _csrf: <%- typeof _csrf !== 'undefined' ? JSON.stringify(_csrf) : 'null' %>,
 
@@ -47,10 +46,9 @@
     <%- body %>
 
     <!--TEMPLATES-->
-    <script type="text/javascript" src="/jst.js"></script>
+    
     <!--TEMPLATES END-->
     <!--SCRIPTS-->
-    <script src="/js/dependencies/sails.io.js"></script>
     <script src="/js/dependencies/angular.js"></script>
     <script src="/js/dependencies/jquery.min.js"></script>
     <script src="/js/dependencies/lodash.js"></script>
@@ -72,7 +70,6 @@
     <script src="/js/controllers/profileFollowingPageController.js"></script>
     <script src="/js/controllers/profilePageController.js"></script>
     <script src="/js/controllers/resetPasswordPageController.js"></script>
-    <script src="/js/controllers/restorePageController.js"></script>
     <script src="/js/controllers/restoreProfilePageController.js"></script>
     <script src="/js/controllers/showVideoPageController.js"></script>
     <script src="/js/controllers/signinPageController.js"></script>
@@ -83,7 +80,6 @@
     <script src="/js/controllers/tutorialsDetailPageController.js"></script>
     <script src="/js/controllers/tutorialsDetailVideoEditPageController.js"></script>
     <script src="/js/controllers/tutorialsDetailVideoNewPageController.js"></script>
-    <script src="/js/controllers/videosPageController.js"></script>
     <!--SCRIPTS END-->
   </div>
 </body>

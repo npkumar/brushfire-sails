@@ -75,7 +75,6 @@ angular.module('brushfire').controller('tutorialsDetailVideoNewPageController', 
     } else {
 
       $scope.tutorialsDetailVideoNew.invalidUrl = true;
-
     }
 
   };
