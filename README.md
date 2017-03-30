@@ -1,3 +1,3 @@
-# brushfire-ch11-end
+# brushfire-ch13-end
 
 a [Sails](http://sailsjs.org) application

@@ -81,6 +81,8 @@ angular.module('brushfire').controller('tutorialsDetailVideoNewPageController', 
 
   $scope.addvideo = function() {
 
+    console.log('made it to addVideo');
+
     $http.post('/tutorials/'+$scope.fromUrlTutorialId+'/videos', {
       owner: $scope.fromUrlTutorialId,
       title: $scope.title,

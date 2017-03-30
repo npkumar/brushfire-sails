@@ -17,13 +17,13 @@ module.exports = {
       type: 'string'
     },
 
-    owner: {
-      type: 'json'
-    },
-
     // owner: {
-    //   model: 'user'
+    //   type: 'json'
     // },
+
+    owner: {
+      model: 'user'
+    },
     
     // An array of video ids representing the manual (human) ordering of videos. 
     videoOrder: {
@@ -35,14 +35,14 @@ module.exports = {
       // (this is always ok because there will never be millions of videos per tutorial)
     },
 
-    videos: {
-      collection: 'video',
-      via: 'tutorialAssoc'
-    },
-
     ratings: {
       collection: 'rating',
       via: 'byTutorial'
+    },
+
+    videos: {
+      collection: 'video',
+      via: 'tutorialAssoc'
     }
   }
 };

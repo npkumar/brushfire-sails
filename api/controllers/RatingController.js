@@ -6,6 +6,20 @@
  */
 
 module.exports = {
-	
+
+  attributes: {
+
+    stars: {
+      type: 'integer'
+    },
+
+    byUser: {
+      model: 'user'
+    },
+
+    byTutorial: {
+      model: 'tutorial'
+    }
+  }
 };
 
